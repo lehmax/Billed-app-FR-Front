@@ -121,25 +121,43 @@ describe("Given I am connected as an employee", () => {
     test("Then fetches bills from mock API GET", async () => {
       window.onNavigate(ROUTES_PATH.Bills);
 
-      expect(screen.findByText("test1")).toBeTruthy();
-      expect(screen.findByText("test2")).toBeTruthy();
-      expect(screen.findByText("test3")).toBeTruthy();
+      await waitFor(() => screen.getByText("Mes notes de frais"));
+
+      expect(screen.getByText("test1")).toBeTruthy();
+      expect(screen.getByText("test2")).toBeTruthy();
+      expect(screen.getByText("test3")).toBeTruthy();
     });
 
-    test("Then API return an empty payload on fetch bills", async () => {
+    test("fetch a bill with no date", async () => {
       jest.spyOn(mockStore, "bills");
 
       mockStore.bills.mockImplementationOnce(() => {
         return {
           list: () => {
-            return Promise.resolve([{}]);
+            return Promise.resolve([
+              {
+                id: "BeKy5Mo4jkmdfPGYpTxZ",
+                vat: "",
+                amount: 100,
+                name: "test1",
+                fileName: "1592770761.jpeg",
+                commentary: "plop",
+                pct: 20,
+                type: "Transports",
+                email: "a@a",
+                fileUrl:
+                  "https://test.storage.tld/v0/b/billable-677b6.a…61.jpeg?alt=media&token=7685cd61-c112-42bc-9929-8a799bb82d8b",
+                status: "refused",
+                commentAdmin: "en fait non",
+              },
+            ]);
           },
         };
       });
 
       window.onNavigate(ROUTES_PATH.Bills);
-
-      expect(screen.findByText("test1")).toBeTruthy();
+      await waitFor(() => screen.getByText("Mes notes de frais"));
+      expect(screen.getByText("test1")).toBeTruthy();
     });
   });
 
@@ -172,9 +190,11 @@ describe("Given I am connected as an employee", () => {
         };
       });
 
-      window.onNavigate(ROUTES_PATH.Dashboard);
+      window.onNavigate(ROUTES_PATH.Bills);
 
-      expect(screen.findByText(/Erreur 404/)).toBeTruthy();
+      await waitFor(() => screen.getByText("Erreur"));
+      const message = await screen.getByText(/Erreur 404/);
+      expect(message).toBeTruthy();
     });
 
     test("Then fetches bills from an API and fails with server error 500 HTTP status code", async () => {
@@ -186,9 +206,11 @@ describe("Given I am connected as an employee", () => {
         };
       });
 
-      window.onNavigate(ROUTES_PATH.Dashboard);
+      window.onNavigate(ROUTES_PATH.Bills);
 
-      expect(screen.findByText(/Erreur 500/)).toBeTruthy();
+      await waitFor(() => screen.getByText("Erreur"));
+      const message = await screen.getByText(/Erreur 500/);
+      expect(message).toBeTruthy();
     });
   });
 });
