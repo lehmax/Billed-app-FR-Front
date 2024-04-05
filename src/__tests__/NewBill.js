@@ -1,18 +1,32 @@
+import { isPicture } from "../containers/NewBill";
+
 /**
  * @jest-environment jsdom
  */
 
-import { screen } from "@testing-library/dom"
-import NewBillUI from "../views/NewBillUI.js"
-import NewBill from "../containers/NewBill.js"
-
-
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
-    test("Then ...", () => {
-      const html = NewBillUI()
-      document.body.innerHTML = html
-      //to-do write assertion
-    })
-  })
-})
+    test("Then ...", () => {});
+  });
+});
+
+describe("Given a function to know if media type match to authorised format (only: jpg, png)", () => {
+  describe("When I test a jpg format", () => {
+    it("Should return true", () => {
+      expect(isPicture("image/jpg")).toBeTruthy();
+      expect(isPicture("image/jpeg")).toBeTruthy();
+    });
+  });
+
+  describe("When I test a png format", () => {
+    it("Should return true", () => {
+      expect(isPicture("image/png")).toBeTruthy();
+    });
+  });
+
+  describe("When I test a wrong format for picture ", () => {
+    it("Should return false", () => {
+      expect(isPicture("document/pdf")).toBeFalsy();
+    });
+  });
+});
