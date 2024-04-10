@@ -45,7 +45,7 @@ describe("Given I am connected as an employee", () => {
       ).toBeVisible();
     });
 
-    describe("when I upload a receipt in an unauthorized format", () => {
+    describe("When I upload a receipt in an unauthorized format", () => {
       test("Then I should see an error message", async () => {
         const inputFile = screen.getByTestId("file");
 
@@ -116,20 +116,20 @@ describe("Given I am connected as an employee", () => {
 // Unit test isPicture function
 describe("Given a function to know if media type match to authorised format (only: jpg, png)", () => {
   describe("When I test a jpg format", () => {
-    it("Should return true", () => {
+    test("Then it return true", () => {
       expect(isPicture("image/jpg")).toBeTruthy();
       expect(isPicture("image/jpeg")).toBeTruthy();
     });
   });
 
   describe("When I test a png format", () => {
-    it("Should return true", () => {
+    test("Then it return true", () => {
       expect(isPicture("image/png")).toBeTruthy();
     });
   });
 
-  describe("When I test a wrong format for picture ", () => {
-    it("Should return false", () => {
+  describe("When I test a non authorized format", () => {
+    test("Then it return false", () => {
       expect(isPicture("document/pdf")).toBeFalsy();
     });
   });
