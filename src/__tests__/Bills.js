@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent, screen, waitFor } from "@testing-library/dom";
+import { fireEvent, screen } from "@testing-library/dom";
 import "@testing-library/jest-dom";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store.js";
@@ -92,9 +92,9 @@ describe("Given I am connected as an employee", () => {
       const newBillBtn = screen.getByTestId("btn-new-bill");
       fireEvent.click(newBillBtn);
 
-      await waitFor(() => {
-        expect(screen.getByText("Envoyer une note de frais")).toBeVisible();
-      });
+      expect(
+        await screen.findByText("Envoyer une note de frais")
+      ).toBeVisible();
     });
   });
 });
@@ -121,25 +121,57 @@ describe("Given I am connected as an employee", () => {
     test("Then fetches bills from mock API GET", async () => {
       window.onNavigate(ROUTES_PATH.Bills);
 
-      expect(screen.findByText("test1")).toBeTruthy();
-      expect(screen.findByText("test2")).toBeTruthy();
-      expect(screen.findByText("test3")).toBeTruthy();
+      const bills = await screen.findByTestId("tbody");
+      expect(bills.children.length).toBe(4);
+      expect(screen.getByText("test1")).toBeTruthy();
     });
 
-    test("Then API return an empty payload on fetch bills", async () => {
+    test("fetch a bill with no date", async () => {
       jest.spyOn(mockStore, "bills");
 
       mockStore.bills.mockImplementationOnce(() => {
         return {
           list: () => {
-            return Promise.resolve([{}]);
+            return Promise.resolve([
+              {
+                id: "BeKy5Mo4jkmdfPGYpTxZ",
+                vat: "",
+                amount: 100,
+                name: "test10",
+                fileName: "1592770761.jpeg",
+                commentary: "plop",
+                pct: 20,
+                type: "Transports",
+                email: "a@a",
+                fileUrl:
+                  "https://test.storage.tld/v0/b/billable-677b6.a…61.jpeg?alt=media&token=7685cd61-c112-42bc-9929-8a799bb82d8b",
+                status: "refused",
+                commentAdmin: "en fait non",
+              },
+            ]);
+          },
+        };
+      });
+
+      window.onNavigate(ROUTES_PATH.Bills);
+      expect(await screen.findByText("test10")).toBeTruthy();
+    });
+
+    test("the API return empty data", async () => {
+      jest.spyOn(mockStore, "bills");
+
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () => {
+            return Promise.resolve([]);
           },
         };
       });
 
       window.onNavigate(ROUTES_PATH.Bills);
 
-      expect(screen.findByText("test1")).toBeTruthy();
+      const bills = await screen.findByTestId("tbody");
+      expect(bills.children.length).toBe(0);
     });
   });
 
@@ -172,9 +204,8 @@ describe("Given I am connected as an employee", () => {
         };
       });
 
-      window.onNavigate(ROUTES_PATH.Dashboard);
-
-      expect(screen.findByText(/Erreur 404/)).toBeTruthy();
+      window.onNavigate(ROUTES_PATH.Bills);
+      expect(await screen.findByText(/Erreur 404/)).toBeVisible();
     });
 
     test("Then fetches bills from an API and fails with server error 500 HTTP status code", async () => {
@@ -186,9 +217,8 @@ describe("Given I am connected as an employee", () => {
         };
       });
 
-      window.onNavigate(ROUTES_PATH.Dashboard);
-
-      expect(screen.findByText(/Erreur 500/)).toBeTruthy();
+      window.onNavigate(ROUTES_PATH.Bills);
+      expect(await screen.findByText(/Erreur 500/)).toBeVisible();
     });
   });
 });
