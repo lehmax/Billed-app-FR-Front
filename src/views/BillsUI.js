@@ -1,8 +1,8 @@
-import ErrorPage from "./ErrorPage.js"
-import LoadingPage from "./LoadingPage.js"
-import VerticalLayout from "./VerticalLayout.js"
+import ErrorPage from "./ErrorPage.js";
+import LoadingPage from "./LoadingPage.js";
+import VerticalLayout from "./VerticalLayout.js";
 
-import Actions from "./Actions.js"
+import Actions from "./Actions.js";
 
 const row = (bill) => {
   return `
@@ -13,11 +13,13 @@ const row = (bill) => {
       <td>${bill.amount} €</td>
       <td>${bill.status}</td>
       <td>
-        ${Actions(bill.fileUrl)}
+        ${
+          bill.fileName && bill.fileName !== "null" ? Actions(bill.fileUrl) : ""
+        }
       </td>
     </tr>
-    `
-}
+    `;
+};
 
 const rows = (data) => {
   return data && data.length
@@ -25,8 +27,8 @@ const rows = (data) => {
         .sort((a, b) => new Date(b.date) - new Date(a.date))
         .map((bill) => row(bill))
         .join("")
-    : ""
-}
+    : "";
+};
 
 export default ({ data: bills, loading, error }) => {
   const modal = () => `
@@ -44,12 +46,12 @@ export default ({ data: bills, loading, error }) => {
         </div>
       </div>
     </div>
-  `
+  `;
 
   if (loading) {
-    return LoadingPage()
+    return LoadingPage();
   } else if (error) {
-    return ErrorPage(error)
+    return ErrorPage(error);
   }
 
   return `
@@ -79,5 +81,5 @@ export default ({ data: bills, loading, error }) => {
         </div>
       </div>
       ${modal()}
-    </div>`
-}
+    </div>`;
+};
